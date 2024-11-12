@@ -1,5 +1,6 @@
 import telebot
-from manager import ShopManager, CartManager, API_TOKEN
+from managers.shop_manager import ShopManager, API_TOKEN
+from managers.cart_manager import CartManager
 
 bot = telebot.TeleBot(API_TOKEN)
 shop = ShopManager()
@@ -22,8 +23,8 @@ def catalog(message):
 
 
 @bot.message_handler(commands=['cart'])
-def show_cart(message):
-    cart.show_cart(message)
+def get(message):
+    cart.get(message)
 
 
 @bot.message_handler(commands=['clear'])
