@@ -1,18 +1,4 @@
-import telebot
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-import os
-from dotenv import load_dotenv
-from db.base import CartItem
-
-load_dotenv()
-API_TOKEN = os.getenv('API_TOKEN')
-DATABASE_URL = os.getenv('DATABASE_URL')
-
-bot = telebot.TeleBot(API_TOKEN)
-engine = create_engine(DATABASE_URL)
-Session = sessionmaker(bind=engine)
-session = Session()
+from bot import bot
 
 
 class CartManager:
