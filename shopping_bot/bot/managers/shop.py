@@ -16,6 +16,10 @@ session = Session()
 
 
 class ShopManager:
+    def __init__(self, cart_storage, shop_storage) -> None:
+        self._cart_storage = cart_storage
+        self._shop_storage = shop_storage
+
     def send_welcome(self, message: str) -> None:
         bot.send_message(message.chat.id, f"{message.from_user.first_name}, добро пожаловать в наш магазин! Введите /help для просмотра доступных команд или /catalog для просмотра товаров.")
 
@@ -29,7 +33,7 @@ class ShopManager:
         "Просто отправьте название товара, чтобы добавить его в корзину.")
          
     def catalog(self, message: str) -> None:
-        items = session.query(Item).all()
+        items = self._shop_storage.get_all()
         if items:
             catalog = "Каталог товаров:\n"
             for item in items:
@@ -41,15 +45,13 @@ class ShopManager:
 
     def add_to_cart(self, message: str) -> None:
         item_name = message.text.strip()
-        item = session.query(Item).filter_by(name=item_name).first()
+        item = self._shop_storage.get_item(name = item_name)
         if item:
-            cart_item = session.query(CartItem).filter_by(user=message.from_user.username, item_id=item.item_id).first()
+            cart_item = self._cart_storage.get_item(user=message.from_user.username, item_id=item.item_id)
             if cart_item:
-                cart_item.quantity += 1
+                self._cart_storage.increment(user=message.from_user.username, item_id=item.item_id)
             else:
-                cart_item = CartItem(user=message.from_user.username, item_id=item.item_id, quantity=1)
-                session.add(cart_item)
-            session.commit()
+                self._cart_storage.add(user=message.from_user.username, item_id=item.item_id)
             bot.send_message(message.chat.id, f'Товар "{item_name}" добавлен в корзину.')
         else:
             bot.send_message(message.chat.id, 'Товар не найден. Пожалуйста, введите корректное название товара.')

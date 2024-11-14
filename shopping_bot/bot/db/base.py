@@ -1,17 +1,29 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, sessionmaker
 import os
 from dotenv import load_dotenv
+from contextlib import contextmanager
 
 load_dotenv()
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 Base = declarative_base()
 
-# engine = create_engine(DATABASE_URL)
-# Session = sessionmaker(bind=engine)
-# session = Session()
+engine = create_engine(DATABASE_URL)
+Session = sessionmaker(bind=engine)
+
+
+@contextmanager
+def create_session(session_maker = Session):
+    new_session = session_maker()
+    try:
+        yield new_session
+    except Exception:
+        new_session.rollback()
+        raise 
+    finally:
+        new_session.close()
 
 class Item(Base):
     __tablename__ = 'items'

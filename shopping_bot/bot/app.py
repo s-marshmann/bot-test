@@ -1,10 +1,12 @@
 import telebot
-from managers.shop_manager import ShopManager, API_TOKEN
-from managers.cart_manager import CartManager
+from managers.shop import ShopManager, API_TOKEN
+from managers.cart import CartManager
+from storage.shop import ShopStorage
+from storage.cart import CartStorage
 
 bot = telebot.TeleBot(API_TOKEN)
-shop = ShopManager()
-cart = CartManager()
+shop = ShopManager(shop_storage=ShopStorage(), cart_storage=CartStorage())
+cart = CartManager(cart_storage=CartStorage())
 
 
 @bot.message_handler(commands=['start'])

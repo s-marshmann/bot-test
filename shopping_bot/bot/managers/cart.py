@@ -16,8 +16,11 @@ session = Session()
 
 
 class CartManager:
+    def __init__(self, cart_storage) -> None:
+        self._cart_storage = cart_storage
+
     def get(self, message: str) -> None:
-        cart_items = session.query(CartItem).filter_by(user=message.from_user.username).all()
+        cart_items = self._cart_storage.get_all(user=message.from_user.username)
         if cart_items:
             cart = "Ваша корзина:\n"
             total = 0
@@ -32,15 +35,13 @@ class CartManager:
         bot.send_message(message.chat.id, cart)
 
     def clear(self, message: str) -> None:
-        session.query(CartItem).filter_by(user=message.from_user.username).delete()
-        session.commit()
+        self._cart_storage.delete(user=message.from_user.username)
         bot.send_message(message.chat.id, 'Ваша корзина очищена.')
 
     def checkout(self, message: str) -> None:
-        cart_items = session.query(CartItem).filter_by(user=message.from_user.username).all()
+        cart_items = self._cart_storage.get_all(user=message.from_user.username)
         if cart_items:
-            session.query(CartItem).filter_by(user=message.from_user.username).delete()
-            session.commit()
+            self._cart_storage.delete(user=message.from_user.username)
             checkout = "Спасибо, что оформили заказ!\nОжидайте звонка от нашего менеджера."
         else:
             checkout = "В корзине пока ничего нет.\nВведите название товара, чтобы добавить его в корзину."
