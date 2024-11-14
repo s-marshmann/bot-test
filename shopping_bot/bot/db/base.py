@@ -18,9 +18,18 @@ def create_session(session_maker = Session):
     new_session = session_maker()
     try:
         yield new_session
+        new_session.commit()
     except Exception:
         new_session.rollback()
         raise 
+    finally:
+        new_session.close()
+
+@contextmanager
+def create_read_only_session(session_maker = Session):
+    new_session = session_maker()
+    try:
+        yield new_session 
     finally:
         new_session.close()
 

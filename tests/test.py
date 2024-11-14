@@ -1,12 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import os
-from dotenv import load_dotenv
-from shopping_bot.db.base import Item
-
-load_dotenv()
-DATABASE_URL = os.getenv('DATABASE_URL')
+from shopping_bot.bot.db.base import Item, DATABASE_URL
 
 Base = declarative_base()
 
